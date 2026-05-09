@@ -1,0 +1,101 @@
+{
+  "character_links": [
+    {
+      "id": "yan_wuqiu",
+      "name": "晏无秋",
+      "faction": "拜月",
+      "role": "圣子",
+      "bio_snippet": "明面执礼，暗线握刀；今夜入席多带三分试探。"
+    },
+    {
+      "id": "you_ying",
+      "name": "幽影",
+      "faction": "拜月",
+      "role": "暗卫首领",
+      "bio_snippet": "专司截信与盯梢，少在人前露相。"
+    },
+    {
+      "id": "leng_yue",
+      "name": "冷月",
+      "faction": "拜月",
+      "role": "执礼长老",
+      "bio_snippet": "管名册与席次，封蜡多经其手。"
+    },
+    {
+      "id": "xuan_ya",
+      "name": "玄鸦",
+      "faction": "拜月",
+      "role": "信风堂主",
+      "bio_snippet": "走街串巷的耳目总管，话少事多。"
+    },
+    {
+      "id": "qing_yan",
+      "name": "青魇",
+      "faction": "拜月",
+      "role": "刑堂副使",
+      "bio_snippet": "擅问口供，阁里人都不愿与他同桌。"
+    },
+    {
+      "id": "chi_lian",
+      "name": "赤练",
+      "faction": "拜月",
+      "role": "药蛊司祭",
+      "bio_snippet": "携香带毒，常为圣子试盏。"
+    }
+  ],
+  "roster_pool_by_faction": {
+    "拜月": [
+      { "name": "幽影", "role": "暗卫首领", "link_id": "you_ying" },
+      { "name": "冷月", "role": "执礼长老", "link_id": "leng_yue" },
+      { "name": "玄鸦", "role": "信风堂主", "link_id": "xuan_ya" },
+      { "name": "青魇", "role": "刑堂副使", "link_id": "qing_yan" },
+      { "name": "赤练", "role": "药蛊司祭", "link_id": "chi_lian" }
+    ]
+  },
+  "secret_definitions": {
+    "merged_baiyue_entry": {
+      "title": "拜月教首次参会",
+      "tier": 3,
+      "generator_key": "sect_entry_notice",
+      "faction": "拜月"
+    },
+    "merged_wudu_entry": {
+      "title": "五毒教首次参会",
+      "tier": 3,
+      "generator_key": "sect_entry_notice",
+      "faction": "五毒"
+    },
+    "secret_baiyue_roster": {
+      "title": "拜月教赴会弟子名录",
+      "tier": 4,
+      "generator_key": "baiyue_roster",
+      "faction": "拜月"
+    },
+    "secret_baiyue_intrigue": {
+      "title": "拜月教内斗风声",
+      "tier": 5,
+      "generator_key": "baiyue_intrigue",
+      "faction": "拜月"
+    },
+    "secret_mojiao_order": {
+      "title": "魔教调令",
+      "tier": 5,
+      "generator_key": "mojiao_order",
+      "faction": "拜月"
+    }
+  },
+  "ledger_bindings": [
+    {
+      "match": ["拜月", "内斗"],
+      "secret_id": "secret_baiyue_intrigue"
+    },
+    {
+      "match": ["魔教", "调令"],
+      "secret_id": "secret_mojiao_order"
+    },
+    {
+      "match": ["魔教", "令"],
+      "secret_id": "secret_mojiao_order"
+    }
+  ]
+}

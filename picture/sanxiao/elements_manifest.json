@@ -1,0 +1,114 @@
+[
+  {
+    "id": "jiutan",
+    "label": "玲珑酒坛",
+    "file": "tile_01_jiutan.png",
+    "width": 171,
+    "height": 185,
+    "source": {
+      "image": "ad9b84ac-a093-4e2c-aa56-fdeb0e63ff57.jpg",
+      "rect": {
+        "w": 205,
+        "h": 215,
+        "y": 15,
+        "x": 20
+      }
+    }
+  },
+  {
+    "id": "peach_letter",
+    "label": "桃花笺",
+    "file": "tile_02_peach_letter.png",
+    "width": 195,
+    "height": 163,
+    "source": {
+      "image": "ad9b84ac-a093-4e2c-aa56-fdeb0e63ff57.jpg",
+      "rect": {
+        "w": 240,
+        "h": 205,
+        "y": 35,
+        "x": 260
+      }
+    }
+  },
+  {
+    "id": "bamboo_flute",
+    "label": "青竹笛",
+    "file": "tile_03_bamboo_flute.png",
+    "width": 188,
+    "height": 197,
+    "source": {
+      "image": "ad9b84ac-a093-4e2c-aa56-fdeb0e63ff57.jpg",
+      "rect": {
+        "w": 240,
+        "h": 225,
+        "y": 15,
+        "x": 510
+      }
+    }
+  },
+  {
+    "id": "fox_mask",
+    "label": "赤狐面具",
+    "file": "tile_04_fox_mask.png",
+    "width": 183,
+    "height": 179,
+    "source": {
+      "image": "ad9b84ac-a093-4e2c-aa56-fdeb0e63ff57.jpg",
+      "rect": {
+        "w": 220,
+        "h": 215,
+        "y": 15,
+        "x": 760
+      }
+    }
+  },
+  {
+    "id": "gold_ingot",
+    "label": "小金元宝",
+    "file": "tile_05_gold_ingot.png",
+    "width": 189,
+    "height": 131,
+    "source": {
+      "image": "ad9b84ac-a093-4e2c-aa56-fdeb0e63ff57.jpg",
+      "rect": {
+        "w": 240,
+        "h": 165,
+        "y": 300,
+        "x": 270
+      }
+    }
+  },
+  {
+    "id": "crane_feather",
+    "label": "白鹤羽翎",
+    "file": "tile_06_crane_feather.png",
+    "width": 168,
+    "height": 168,
+    "source": {
+      "image": "ad9b84ac-a093-4e2c-aa56-fdeb0e63ff57.jpg",
+      "rect": {
+        "w": 210,
+        "h": 175,
+        "y": 300,
+        "x": 555
+      }
+    }
+  },
+  {
+    "id": "purple_spider",
+    "label": "紫色毒蛛",
+    "file": "tile_07_purple_spider.png",
+    "width": 190,
+    "height": 129,
+    "source": {
+      "image": "ad9b84ac-a093-4e2c-aa56-fdeb0e63ff57.jpg",
+      "rect": {
+        "w": 190,
+        "h": 155,
+        "y": 305,
+        "x": 790
+      }
+    }
+  }
+]

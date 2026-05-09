@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>江湖百晓生 · 第一章试玩</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <h1>江湖百晓生</h1>
+        <p class="subtitle">第一章试玩 · 风起听风阁</p>
+      </header>
+
+      <main class="phone-frame">
+        <section class="panel chapter-panel">
+          <div class="panel-head">
+            <div>
+              <p class="panel-kicker">Chapter 01</p>
+              <h2 id="scene-title">风起听风阁</h2>
+            </div>
+            <div class="head-badges">
+              <span class="engine-badge" id="story-engine">AI 待命</span>
+              <span class="phase-badge" id="scene-phase">准备开章</span>
+            </div>
+          </div>
+
+          <div class="story-scroll" id="story-scroll">
+            <div class="story-card">
+              <p id="narration" class="narration">点击下方“开始第一章”，让 AI 生成开场。</p>
+            </div>
+
+            <div class="dialogue-list" id="dialogue-list"></div>
+
+            <div class="state-commentary" id="state-commentary">
+              这个试玩页只跑一个章节，但已经把 AI 叙事、规则数值和竖屏视觉结构分开。
+            </div>
+          </div>
+        </section>
+
+        <section class="panel action-panel">
+          <div class="action-head">
+            <h3>当前抉择</h3>
+            <button class="ghost-button" id="restart-button">重新开章</button>
+          </div>
+
+          <div class="choices" id="choices"></div>
+
+          <label class="free-input">
+            <span>自由发话</span>
+            <textarea
+              id="free-input"
+              rows="2"
+              maxlength="120"
+              placeholder="例如：今夜风大，诸位不如先喝一盏热酒，再谈武林大比。"
+            ></textarea>
+          </label>
+
+          <div class="action-row">
+            <button class="primary-button" id="free-submit">把这句话交给 AI</button>
+            <button class="secondary-button" id="start-button">开始第一章</button>
+          </div>
+        </section>
+
+        <section class="panel status-panel">
+          <div class="status-grid">
+            <article class="stat-chip">
+              <span>银两</span>
+              <strong id="silver">120</strong>
+            </article>
+            <article class="stat-chip">
+              <span>情报</span>
+              <strong id="intel">1</strong>
+            </article>
+            <article class="stat-chip danger">
+              <span>暴露</span>
+              <strong id="exposure">18</strong>
+            </article>
+            <article class="stat-chip">
+              <span>酒楼热度</span>
+              <strong id="heat">42</strong>
+            </article>
+          </div>
+
+          <div class="rapport-list" id="rapport-list"></div>
+        </section>
+
+        <nav class="hub-dock" aria-label="江湖枢纽">
+          <button type="button" class="hub-dock-btn" id="hub-chat" data-hub="chat">人物</button>
+          <button type="button" class="hub-dock-btn" id="hub-items" data-hub="items">道具</button>
+          <button type="button" class="hub-dock-btn" id="hub-factions" data-hub="factions">门派</button>
+          <button type="button" class="hub-dock-btn" id="hub-custom" data-hub="custom">自定义</button>
+        </nav>
+      </main>
+    </div>
+
+    <!-- 江湖传信 · 宣纸信笺风私聊 -->
+    <div class="hub-overlay hidden" id="hub-chat-overlay" aria-hidden="true">
+      <div class="wechat-phone">
+        <div class="wechat-screen" id="wechat-list-screen">
+          <header class="wechat-nav">
+            <span class="wechat-nav-placeholder"></span>
+            <h2 class="wechat-title">江湖传信</h2>
+            <button type="button" class="wechat-icon-btn" id="wechat-close" aria-label="关闭">×</button>
+          </header>
+          <div class="wechat-list" id="wechat-contact-list"></div>
+        </div>
+        <div class="wechat-screen hidden" id="wechat-thread-screen">
+          <header class="wechat-nav">
+            <button type="button" class="wechat-back" id="wechat-back" aria-label="返回">‹</button>
+            <h2 class="wechat-title" id="wechat-thread-title">传信</h2>
+            <span class="wechat-nav-placeholder"></span>
+          </header>
+          <div class="wechat-messages" id="wechat-messages"></div>
+          <footer class="wechat-input-bar">
+            <button type="button" class="wechat-gift-btn" id="wechat-gift" title="赠礼">赠礼</button>
+            <input type="text" id="wechat-input" maxlength="200" placeholder="提笔写几句…" autocomplete="off" />
+            <button type="button" class="wechat-send" id="wechat-send">发送</button>
+          </footer>
+          <div class="gift-picker hidden" id="gift-picker" aria-hidden="true">
+            <div class="gift-picker-sheet" role="dialog" aria-modal="true" aria-labelledby="gift-picker-title">
+              <header class="gift-picker-head">
+                <h3 id="gift-picker-title">行囊 · 可赠之物</h3>
+                <button type="button" class="gift-picker-x" id="gift-picker-close" aria-label="关闭">×</button>
+              </header>
+              <p class="gift-picker-hint">仅二合所得信物、酒坛、笛子等；秘辛笺不可赠。</p>
+              <ul class="gift-picker-list" id="gift-picker-list"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hub-overlay hidden" id="hub-items-overlay" aria-hidden="true">
+      <div class="hub-sheet">
+        <header class="hub-sheet-head">
+          <h2>道具 · 消息秘辛</h2>
+          <button type="button" class="ghost-button hub-sheet-close" data-close="items">关闭</button>
+        </header>
+        <p class="hub-sheet-lead">仅展示二合整编与关键对白凝结的秘辛；进度描写已归入剧情日志。点条目阅笺，于笺内售卖给七派。</p>
+        <p class="hub-sheet-note hidden" id="intel-sale-feedback" aria-live="polite"></p>
+        <ul class="intel-list" id="intel-item-list"></ul>
+        <div class="intel-detail-overlay hidden" id="intel-detail-overlay" aria-hidden="true">
+          <div class="intel-detail-sheet" role="dialog" aria-modal="true" aria-labelledby="intel-detail-title">
+            <header class="intel-detail-head">
+              <div>
+                <h3 id="intel-detail-title" class="intel-detail-name">秘辛</h3>
+                <p class="intel-detail-tier" id="intel-detail-tier">情报等级 Lv.1</p>
+              </div>
+              <button type="button" class="ghost-button" id="intel-detail-close" aria-label="关闭">×</button>
+            </header>
+            <div class="intel-detail-body" id="intel-detail-body"></div>
+            <footer class="intel-detail-foot">
+              <button type="button" class="primary-button intel-detail-sell" id="intel-detail-sell">售卖给门派</button>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hub-overlay hidden" id="hub-factions-overlay" aria-hidden="true">
+      <div class="hub-sheet">
+        <header class="hub-sheet-head">
+          <h2>门派势力</h2>
+          <button type="button" class="ghost-button hub-sheet-close" data-close="factions">关闭</button>
+        </header>
+        <p class="hub-sheet-lead">各派声势 0–100，与剧情状态同步；售卖情报会改变声势与暴露，率先达 100 的门派将推举武林盟主（试玩展示）。</p>
+        <div class="faction-list" id="faction-bars"></div>
+        <p class="hub-sheet-note" id="faction-leader-note"></p>
+      </div>
+    </div>
+
+    <div class="hub-overlay hidden" id="hub-custom-overlay" aria-hidden="true">
+      <div class="hub-sheet hub-sheet--compact">
+        <header class="hub-sheet-head hub-sheet-head--compact">
+          <h2>自定义</h2>
+          <button type="button" class="ghost-button hub-sheet-close" data-close="custom">关闭</button>
+        </header>
+        <div class="custom-form custom-form--compact">
+          <label class="custom-field">
+            <span>玩家姓名</span>
+            <input type="text" id="custom-player-name" maxlength="16" placeholder="如何在江湖自称" />
+          </label>
+          <p class="hub-sheet-lead small custom-hint">新 NPC 进「人物」列表与好感条。</p>
+          <label class="custom-field">
+            <span>新 NPC 姓名</span>
+            <input type="text" id="custom-npc-name" maxlength="16" placeholder="必填" />
+          </label>
+          <label class="custom-field">
+            <span>性格</span>
+            <input type="text" id="custom-npc-personality" maxlength="80" placeholder="如：寡言、多疑、爱打趣" />
+          </label>
+          <label class="custom-field">
+            <span>来历</span>
+            <textarea id="custom-npc-backstory" rows="2" maxlength="240" placeholder="出身、与听风阁的关系等"></textarea>
+          </label>
+          <div class="custom-actions">
+            <button type="button" class="secondary-button" id="custom-save-player">保存姓名</button>
+            <button type="button" class="primary-button" id="custom-add-npc">新增 NPC</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="mini-overlay hidden" id="mini-overlay" aria-hidden="true">
+      <div class="mini-shell">
+        <header class="mini-shell-head">
+          <div>
+            <p class="panel-kicker">Mini Game</p>
+            <h2 id="mini-game-title">小游戏</h2>
+          </div>
+          <button class="ghost-button" id="close-mini-button">关闭</button>
+        </header>
+
+        <p class="mini-shell-copy" id="mini-shell-copy">根据当前局面触发的小游戏。</p>
+
+        <div class="mini-stats" id="mini-stats"></div>
+        <div class="mini-notice hidden" id="mini-notice"></div>
+
+        <div class="mini-stage" id="mini-stage">
+          <div class="match3-board hidden" id="match3-board"></div>
+
+          <div class="merge-board hidden" id="merge-board"></div>
+
+          <div class="snake-wrap hidden" id="snake-wrap">
+            <canvas id="snake-canvas" width="240" height="240"></canvas>
+            <div class="snake-controls">
+              <button class="dir-button" data-dir="up">上</button>
+              <div class="snake-controls-row">
+                <button class="dir-button" data-dir="left">左</button>
+                <button class="dir-button" data-dir="down">下</button>
+                <button class="dir-button" data-dir="right">右</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-feedback" id="mini-feedback">等待开始。</div>
+
+        <div class="mini-actions">
+          <button class="secondary-button" id="mini-start-button">开始挑战</button>
+          <button class="primary-button hidden" id="mini-submit-button">结算并继续剧情</button>
+        </div>
+      </div>
+    </section>
+
+    <template id="dialogue-template">
+      <article class="dialogue-item">
+        <header>
+          <strong class="speaker"></strong>
+          <span class="mood"></span>
+        </header>
+        <p class="line"></p>
+      </article>
+    </template>
+
+    <template id="choice-template">
+      <button class="choice-button">
+        <span class="choice-label"></span>
+        <small class="choice-risk"></small>
+      </button>
+    </template>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,109 @@
+{
+  "name": "erhe_elements",
+  "source_image": "7a90c56a-9c1f-49d4-b388-cfc35d64766c.jpg",
+  "count": 6,
+  "items": [
+    {
+      "index": 1,
+      "id": "flying_note",
+      "label": "飞舞的小纸条",
+      "file": "erhe_01_flying_note.png",
+      "source": "7a90c56a-9c1f-49d4-b388-cfc35d64766c.jpg",
+      "original_bbox": {
+        "left": 54,
+        "top": 209,
+        "right": 171,
+        "bottom": 330
+      },
+      "size": {
+        "width": 118,
+        "height": 122
+      }
+    },
+    {
+      "index": 2,
+      "id": "wind_bell",
+      "label": "听风铃铎",
+      "file": "erhe_02_wind_bell.png",
+      "source": "7a90c56a-9c1f-49d4-b388-cfc35d64766c.jpg",
+      "original_bbox": {
+        "left": 216,
+        "top": 196,
+        "right": 324,
+        "bottom": 344
+      },
+      "size": {
+        "width": 109,
+        "height": 149
+      }
+    },
+    {
+      "index": 3,
+      "id": "sealed_letter",
+      "label": "封蜡信笺",
+      "file": "erhe_03_sealed_letter.png",
+      "source": "7a90c56a-9c1f-49d4-b388-cfc35d64766c.jpg",
+      "original_bbox": {
+        "left": 360,
+        "top": 218,
+        "right": 493,
+        "bottom": 322
+      },
+      "size": {
+        "width": 134,
+        "height": 105
+      }
+    },
+    {
+      "index": 4,
+      "id": "gold_scroll",
+      "label": "描金卷轴",
+      "file": "erhe_04_gold_scroll.png",
+      "source": "7a90c56a-9c1f-49d4-b388-cfc35d64766c.jpg",
+      "original_bbox": {
+        "left": 514,
+        "top": 200,
+        "right": 657,
+        "bottom": 339
+      },
+      "size": {
+        "width": 144,
+        "height": 140
+      }
+    },
+    {
+      "index": 5,
+      "id": "jade_box",
+      "label": "茧玉机关盒",
+      "file": "erhe_05_jade_box.png",
+      "source": "7a90c56a-9c1f-49d4-b388-cfc35d64766c.jpg",
+      "original_bbox": {
+        "left": 673,
+        "top": 202,
+        "right": 811,
+        "bottom": 333
+      },
+      "size": {
+        "width": 139,
+        "height": 132
+      }
+    },
+    {
+      "index": 6,
+      "id": "lacquer_fan",
+      "label": "百晓生金漆扇",
+      "file": "erhe_06_lacquer_fan.png",
+      "source": "7a90c56a-9c1f-49d4-b388-cfc35d64766c.jpg",
+      "original_bbox": {
+        "left": 825,
+        "top": 209,
+        "right": 995,
+        "bottom": 332
+      },
+      "size": {
+        "width": 171,
+        "height": 124
+      }
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "image": "chapter01_match3_atlas.png",
+    "imagePath": "/static/assets/sanxiao/chapter01_match3_atlas.png",
+    "size": {
+      "w": 384,
+      "h": 384
+    },
+    "cell": {
+      "w": 192,
+      "h": 192
+    },
+    "padding": 12,
+    "chapter": "chapter-01",
+    "miniGame": "match3",
+    "elementCodes": [
+      "01",
+      "02",
+      "04",
+      "05"
+    ]
+  },
+  "tileOrder": [
+    "jiutan",
+    "peach_letter",
+    "fox_mask",
+    "gold_ingot"
+  ],
+  "frames": {
+    "jiutan": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "spriteSourceSize": {
+        "x": 18,
+        "y": 12,
+        "w": 155,
+        "h": 168
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "code": "01",
+      "id": "jiutan",
+      "label": "玲珑酒坛",
+      "index": 0
+    },
+    "peach_letter": {
+      "frame": {
+        "x": 192,
+        "y": 0,
+        "w": 192,
+        "h": 192
+      },
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 26,
+        "w": 168,
+        "h": 140
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "code": "02",
+      "id": "peach_letter",
+      "label": "桃花笺",
+      "index": 1
+    },
+    "fox_mask": {
+      "frame": {
+        "x": 0,
+        "y": 192,
+        "w": 192,
+        "h": 192
+      },
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 14,
+        "w": 168,
+        "h": 164
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "code": "04",
+      "id": "fox_mask",
+      "label": "赤狐面具",
+      "index": 2
+    },
+    "gold_ingot": {
+      "frame": {
+        "x": 192,
+        "y": 192,
+        "w": 192,
+        "h": 192
+      },
+      "spriteSourceSize": {
+        "x": 12,
+        "y": 38,
+        "w": 168,
+        "h": 116
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 192
+      },
+      "code": "05",
+      "id": "gold_ingot",
+      "label": "小金元宝",
+      "index": 3
+    }
+  }
+}
