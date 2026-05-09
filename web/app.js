@@ -115,10 +115,34 @@ loadFactionStore();
 const MATCH3_ATLAS_URL = "/static/assets/sanxiao/chapter01_match3_atlas.json";
 
 const MATCH3_FALLBACK_TILES = [
-  { id: "jiutan", code: "01", label: "玲珑酒坛", color: "linear-gradient(180deg, #d8b58e, #b96b46)" },
-  { id: "peach_letter", code: "02", label: "桃花笺", color: "linear-gradient(180deg, #f2d3dd, #df9fb4)" },
-  { id: "fox_mask", code: "04", label: "赤狐面具", color: "linear-gradient(180deg, #f09a79, #cb5447)" },
-  { id: "gold_ingot", code: "05", label: "小金元宝", color: "linear-gradient(180deg, #f8db6d, #d79a20)" },
+  {
+    id: "jiutan",
+    code: "01",
+    label: "玲珑酒坛",
+    color: "linear-gradient(180deg, #d8b58e, #b96b46)",
+    particleColor: "rgba(214, 161, 104, 0.92)",
+  },
+  {
+    id: "peach_letter",
+    code: "02",
+    label: "桃花笺",
+    color: "linear-gradient(180deg, #f2d3dd, #df9fb4)",
+    particleColor: "rgba(243, 187, 205, 0.94)",
+  },
+  {
+    id: "fox_mask",
+    code: "04",
+    label: "赤狐面具",
+    color: "linear-gradient(180deg, #f09a79, #cb5447)",
+    particleColor: "rgba(237, 136, 103, 0.94)",
+  },
+  {
+    id: "gold_ingot",
+    code: "05",
+    label: "小金元宝",
+    color: "linear-gradient(180deg, #f8db6d, #d79a20)",
+    particleColor: "rgba(247, 214, 94, 0.96)",
+  },
 ];
 
 const MERGE_TILES = {
@@ -147,6 +171,10 @@ const MERGE_TILES = {
 };
 
 const el = {
+  appShell: document.querySelector(".app-shell"),
+  openingLobby: document.querySelector("#opening-lobby"),
+  openingStartButton: document.querySelector("#opening-start-button"),
+  openingLobbyError: document.querySelector("#opening-lobby-error"),
   sceneTitle: document.querySelector("#scene-title"),
   scenePhase: document.querySelector("#scene-phase"),
   storyEngine: document.querySelector("#story-engine"),
@@ -252,6 +280,7 @@ function getMatch3Tiles() {
       label: frame.label || id,
       atlasFrame: frame,
       color: MATCH3_FALLBACK_TILES[index % MATCH3_FALLBACK_TILES.length].color,
+      particleColor: MATCH3_FALLBACK_TILES[index % MATCH3_FALLBACK_TILES.length].particleColor,
     };
   });
 }
@@ -329,6 +358,7 @@ function setBusy(nextBusy) {
   stateStore.busy = nextBusy;
   document.body.classList.toggle("loading", nextBusy);
   [
+    el.openingStartButton,
     el.freeSubmit,
     el.startButton,
     el.restartButton,
@@ -344,6 +374,32 @@ function setBusy(nextBusy) {
   Array.from(el.choices.querySelectorAll("button")).forEach((button) => {
     button.disabled = nextBusy;
     button.classList.toggle("is-busy", nextBusy);
+  });
+}
+
+function clearOpeningLobbyError() {
+  if (!el.openingLobbyError) return;
+  el.openingLobbyError.textContent = "";
+  el.openingLobbyError.classList.add("hidden");
+}
+
+function showOpeningLobbyError(message) {
+  if (!el.openingLobbyError) return;
+  el.openingLobbyError.textContent = message;
+  el.openingLobbyError.classList.remove("hidden");
+}
+
+function playOpeningStartPressFx() {
+  if (!el.openingStartButton) return Promise.resolve();
+  el.openingStartButton.classList.remove("is-pressing");
+  // Restart the press animation so each click gets one clear pulse.
+  void el.openingStartButton.offsetWidth;
+  el.openingStartButton.classList.add("is-pressing");
+  return new Promise((resolve) => {
+    window.setTimeout(() => {
+      el.openingStartButton?.classList.remove("is-pressing");
+      resolve();
+    }, 220);
   });
 }
 
@@ -394,14 +450,15 @@ function renderRapport(rapport = {}) {
   const merged = mergeRapportForDisplay(rapport);
   Object.entries(merged).forEach(([name, value]) => {
     const card = document.createElement("article");
-    card.className = "rapport-card";
+    card.className = "status-bar-item";
+    const safeValue = Math.max(0, Math.min(100, Number(value) || 0));
     card.innerHTML = `
-      <header>
+      <div class="status-bar-copy">
         <strong>${escapeHtml(name)}</strong>
-        <span class="rapport-meta">${escapeHtml(String(value))}</span>
-      </header>
-      <div class="rapport-bar">
-        <div class="rapport-fill" style="width:${Math.max(0, Math.min(100, Number(value) || 0))}%"></div>
+        <span class="status-bar-value">${escapeHtml(String(safeValue))}</span>
+      </div>
+      <div class="status-bar-track">
+        <div class="status-bar-fill" style="width:${safeValue}%"></div>
       </div>
     `;
     el.rapportList.appendChild(card);
@@ -988,12 +1045,14 @@ function renderFactionPanel() {
 
 function syncActionPanel() {
   const hasStarted = Boolean(stateStore.gameState);
+  el.appShell?.classList.toggle("app-shell--lobby", !hasStarted);
   el.choices.classList.toggle("hidden", !hasStarted);
   el.freeInputWrap.classList.toggle("hidden", !hasStarted);
   el.freeSubmit.classList.toggle("hidden", !hasStarted);
   el.restartButton.classList.toggle("hidden", !hasStarted);
   el.startButton.classList.toggle("hidden", hasStarted);
   el.actionRow.classList.toggle("single-button", true);
+  if (hasStarted) clearOpeningLobbyError();
 }
 
 function setMiniFeedback(text) {
@@ -1071,8 +1130,10 @@ function renderScene(payload) {
 
   el.sceneTitle.textContent = payload.scene_title;
   el.scenePhase.textContent = payload.scene_phase;
-  el.storyEngine.textContent = payload.using_fallback ? "本轮改用本地兜底" : "AI 正在续写";
-  el.storyEngine.dataset.mode = payload.using_fallback ? "fallback" : "live";
+  if (el.storyEngine) {
+    el.storyEngine.textContent = payload.using_fallback ? "本轮改用本地兜底" : "AI 正在续写";
+    el.storyEngine.dataset.mode = payload.using_fallback ? "fallback" : "live";
+  }
   el.narration.textContent = formatNarrationBlock(payload);
   el.stateCommentary.textContent = formatStateCommentaryBlock(payload);
   el.silver.textContent = payload.state.silver;
@@ -1107,9 +1168,14 @@ async function requestJSON(url, payload) {
   return response.json();
 }
 
-async function startChapter() {
+async function startChapter(options = {}) {
+  const autoStartOpeningMerge = options.autoStartOpeningMerge !== false;
   resetMiniStage();
   closeMiniOverlay();
+  el.appShell?.removeAttribute("data-lobby-error");
+  clearOpeningLobbyError();
+  await playOpeningStartPressFx();
+  el.openingStartButton?.classList.add("is-loading");
   setBusy(true);
   try {
     const payload = await requestJSON("/api/chapter/start", {
@@ -1118,10 +1184,18 @@ async function startChapter() {
     });
     renderScene(payload);
     el.freeInput.value = "";
+    if (autoStartOpeningMerge && stateStore.pendingMiniGame?.type === "merge") {
+      await startMiniGame();
+    }
   } catch (error) {
-    el.stateCommentary.textContent = `开章失败：${error.message}`;
+    el.appShell?.setAttribute("data-lobby-error", "1");
+    const msg = `开章失败：${error.message}`;
+    el.narration.textContent = msg;
+    el.stateCommentary.textContent = msg;
+    showOpeningLobbyError(msg);
   } finally {
     setBusy(false);
+    el.openingStartButton?.classList.remove("is-loading");
   }
 }
 
@@ -1316,6 +1390,259 @@ function areAdjacent(indexA, indexB, size) {
   return Math.abs(rowA - rowB) + Math.abs(colA - colB) === 1;
 }
 
+function getMatch3MotionConfig() {
+  return {
+    // 消除：0.2s 内先轻微放大，再收缩到 0。
+    clearDurationMs: 200,
+    clearPeakScale: 1.2,
+    // 掉落速度：每多掉 1 格，额外增加一点时间；这两项决定整体手感。
+    fallDurationPerCellMs: 92,
+    minFallDurationMs: 160,
+    maxFallDurationMs: 360,
+    // 可切换掉落缓动：expo 更干净，back 更有蓄力感。
+    fallEase: "expo",
+    // 回弹力度：height 控制幅度，duration 控制抖动时间。
+    bounceHeightPx: 10,
+    bounceDurationMs: 130,
+    clearParticleCount: 8,
+  };
+}
+
+function waitForAnimationFrame() {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => resolve());
+  });
+}
+
+function animateOverTime(durationMs, onUpdate) {
+  return new Promise((resolve) => {
+    const start = performance.now();
+
+    function step(now) {
+      const elapsed = now - start;
+      const progress = durationMs <= 0 ? 1 : Math.min(1, elapsed / durationMs);
+      onUpdate(progress);
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      } else {
+        resolve();
+      }
+    }
+
+    requestAnimationFrame(step);
+  });
+}
+
+function easeOutExpo(progress) {
+  if (progress >= 1) return 1;
+  return 1 - 2 ** (-10 * progress);
+}
+
+function easeInBack(progress) {
+  const s = 1.70158;
+  return progress * progress * ((s + 1) * progress - s);
+}
+
+function getMatch3FallEase(progress, easeName) {
+  return easeName === "back" ? easeInBack(progress) : easeOutExpo(progress);
+}
+
+function getMatch3BoardTileNode(index) {
+  return el.match3Board.querySelector(`.match3-tile[data-index="${index}"]`);
+}
+
+function getMatch3TileDataByValue(value) {
+  const tiles = getMatch3Tiles();
+  return tiles[((value % tiles.length) + tiles.length) % tiles.length];
+}
+
+function spawnMatch3ClearParticles(index, value) {
+  const tileNode = getMatch3BoardTileNode(index);
+  const boardRect = el.match3Board.getBoundingClientRect();
+  const tileRect = tileNode?.getBoundingClientRect();
+  if (!tileNode || !tileRect) return;
+
+  const motion = getMatch3MotionConfig();
+  const tileData = getMatch3TileDataByValue(value);
+  const originX = tileRect.left - boardRect.left + tileRect.width / 2;
+  const originY = tileRect.top - boardRect.top + tileRect.height / 2;
+  const color = tileData?.particleColor || "rgba(255,255,255,0.92)";
+
+  for (let i = 0; i < motion.clearParticleCount; i += 1) {
+    const particle = document.createElement("span");
+    particle.className = "match3-clear-particle";
+    const angle = (Math.PI * 2 * i) / motion.clearParticleCount + Math.random() * 0.36;
+    const distance = 16 + Math.random() * 24;
+    const driftX = Math.cos(angle) * distance;
+    const driftY = Math.sin(angle) * distance - (10 + Math.random() * 10);
+    particle.style.left = `${originX}px`;
+    particle.style.top = `${originY}px`;
+    particle.style.setProperty("--dx", `${driftX}px`);
+    particle.style.setProperty("--dy", `${driftY}px`);
+    particle.style.setProperty("--particle-color", color);
+    particle.style.animationDelay = `${Math.random() * 40}ms`;
+    el.match3Board.appendChild(particle);
+    window.setTimeout(() => particle.remove(), 420);
+  }
+}
+
+async function performMatch3Clear(session, matchedSet) {
+  const indices = Array.from(matchedSet);
+  if (!indices.length) return;
+
+  const motion = getMatch3MotionConfig();
+  const animatedNodes = indices
+    .map((index) => ({
+      index,
+      value: session.board[index],
+      node: getMatch3BoardTileNode(index),
+    }))
+    .filter((entry) => entry.node);
+
+  animatedNodes.forEach((entry) => {
+    spawnMatch3ClearParticles(entry.index, entry.value);
+    entry.node.style.willChange = "transform, opacity, filter";
+  });
+
+  await animateOverTime(motion.clearDurationMs, (progress) => {
+    animatedNodes.forEach(({ node }) => {
+      if (!node) return;
+      let scale = 1;
+      if (progress < 0.5) {
+        const t = progress / 0.5;
+        scale = 1 + (motion.clearPeakScale - 1) * t;
+      } else {
+        const t = (progress - 0.5) / 0.5;
+        scale = motion.clearPeakScale * (1 - t);
+      }
+      node.style.transform = `scale(${Math.max(0, scale)})`;
+      node.style.opacity = `${Math.max(0, 1 - progress * 0.9)}`;
+      node.style.filter = `brightness(${1 + progress * 0.16})`;
+    });
+  });
+
+  animatedNodes.forEach(({ node }) => {
+    if (!node) return;
+    node.style.transform = "";
+    node.style.opacity = "";
+    node.style.filter = "";
+    node.style.willChange = "";
+  });
+}
+
+function collapseBoardWithMetadata(board, size) {
+  const tileCount = getMatch3Tiles().length;
+  const moves = [];
+
+  for (let col = 0; col < size; col += 1) {
+    const survivors = [];
+    for (let row = size - 1; row >= 0; row -= 1) {
+      const index = row * size + col;
+      if (board[index] !== null) {
+        survivors.push({ value: board[index], sourceRow: row });
+      }
+    }
+
+    const missing = size - survivors.length;
+    for (let i = 0; i < missing; i += 1) {
+      survivors.push({
+        value: Math.floor(Math.random() * tileCount),
+        sourceRow: -1 - i,
+      });
+    }
+
+    for (let row = size - 1; row >= 0; row -= 1) {
+      const targetIndex = row * size + col;
+      const item = survivors[size - 1 - row];
+      board[targetIndex] = item.value;
+      const distance = item.sourceRow - row;
+      if (distance !== 0) {
+        moves.push({
+          targetIndex,
+          distance: Math.abs(distance),
+        });
+      }
+    }
+  }
+
+  return moves;
+}
+
+async function animateMatch3Fall(node, distance, motion) {
+  if (!node || distance <= 0) return;
+
+  const tileRect = node.getBoundingClientRect();
+  const startOffset = -tileRect.height * distance;
+  const mainDuration = Math.max(motion.minFallDurationMs, Math.min(motion.maxFallDurationMs, distance * motion.fallDurationPerCellMs));
+  const bounceDuration = motion.bounceDurationMs;
+  node.style.willChange = "transform";
+
+  await animateOverTime(mainDuration, (progress) => {
+    const eased = getMatch3FallEase(progress, motion.fallEase);
+    const currentY = startOffset * (1 - eased);
+    node.style.transform = `translateY(${currentY}px)`;
+  });
+
+  await animateOverTime(bounceDuration, (progress) => {
+    let offset = 0;
+    if (progress < 0.34) {
+      offset = (motion.bounceHeightPx * 0.35 * progress) / 0.34;
+    } else if (progress < 0.68) {
+      const t = (progress - 0.34) / 0.34;
+      offset = motion.bounceHeightPx * 0.35 + (-motion.bounceHeightPx * 1.15 - motion.bounceHeightPx * 0.35) * t;
+    } else {
+      const t = (progress - 0.68) / 0.32;
+      offset = -motion.bounceHeightPx * 1.15 * (1 - t);
+    }
+    node.style.transform = `translateY(${offset}px)`;
+  });
+
+  node.style.transform = "";
+  node.style.willChange = "";
+}
+
+async function applyMatch3Gravity(session) {
+  const moves = collapseBoardWithMetadata(session.board, session.size);
+  renderMatch3Board();
+  await waitForAnimationFrame();
+
+  const motion = getMatch3MotionConfig();
+  await Promise.all(
+    moves.map(({ targetIndex, distance }) => animateMatch3Fall(getMatch3BoardTileNode(targetIndex), distance, motion)),
+  );
+}
+
+function checkMatch3Matches(session) {
+  return getMatchSet(session.board, session.size);
+}
+
+async function resolveMatch3Cascade(session, comboDepth = 0) {
+  const matched = checkMatch3Matches(session);
+  if (!matched.size) {
+    return { cleared: 0, combos: comboDepth };
+  }
+
+  session.comboCount = comboDepth + 1;
+  await waitForAnimationFrame();
+  await performMatch3Clear(session, matched);
+
+  matched.forEach((index) => {
+    session.board[index] = null;
+  });
+
+  const clearedThisRound = matched.size;
+  session.cleared += clearedThisRound;
+  renderMiniStats(getMatch3StatBadges(session));
+
+  await applyMatch3Gravity(session);
+
+  const next = await resolveMatch3Cascade(session, comboDepth + 1);
+  return {
+    cleared: clearedThisRound + next.cleared,
+    combos: next.combos,
+  };
+}
+
 function initMatch3() {
   const match3Tiles = getMatch3Tiles();
   const session = {
@@ -1328,6 +1655,8 @@ function initMatch3() {
     selected: null,
     board: createBoard(5, match3Tiles.length),
     dropAnimation: true,
+    animating: false,
+    comboCount: 0,
   };
   stateStore.miniSession = session;
   el.match3Board.classList.remove("hidden");
@@ -1360,60 +1689,54 @@ function renderMatch3Board() {
   session.dropAnimation = false;
 }
 
-function resolveMatch3Board(session) {
-  let total = 0;
-  let combos = 0;
-  while (true) {
-    const matched = getMatchSet(session.board, session.size);
-    if (!matched.size) break;
-    combos += 1;
-    total += matched.size;
-    matched.forEach((index) => {
-      session.board[index] = null;
-    });
-    collapseBoard(session.board, session.size);
-  }
-  session.cleared += total;
-  session.dropAnimation = combos > 0;
-  return { cleared: total, combos };
-}
-
-function tryMatch3Swap(fromIndex, toIndex, triggeredBySwipe = false) {
+async function tryMatch3Swap(fromIndex, toIndex, triggeredBySwipe = false) {
   const session = stateStore.miniSession;
-  if (!session || session.type !== "match3" || stateStore.completedMiniGameResult) return;
+  if (!session || session.type !== "match3" || stateStore.completedMiniGameResult || session.animating) return;
 
   if (!areAdjacent(fromIndex, toIndex, session.size)) return;
 
+  session.animating = true;
   session.moves -= 1;
   [session.board[fromIndex], session.board[toIndex]] = [session.board[toIndex], session.board[fromIndex]];
-  const result = resolveMatch3Board(session);
-  if (!result.cleared) {
-    [session.board[fromIndex], session.board[toIndex]] = [session.board[toIndex], session.board[fromIndex]];
-    setMiniFeedback(triggeredBySwipe ? "这一下没连上，换个方向再试试。" : "这次换位没有制造连消，换个手位再试。");
-  } else {
+  session.selected = null;
+  renderMiniStats(getMatch3StatBadges(session));
+  renderMatch3Board();
+
+  try {
+    const immediateMatches = checkMatch3Matches(session);
+    if (!immediateMatches.size) {
+      [session.board[fromIndex], session.board[toIndex]] = [session.board[toIndex], session.board[fromIndex]];
+      renderMatch3Board();
+      setMiniFeedback(triggeredBySwipe ? "这一下没连上，换个方向再试试。" : "这次换位没有制造连消，换个手位再试。");
+      return;
+    }
+
+    const result = await resolveMatch3Cascade(session, 0);
     let bonusText = "";
     if (result.combos >= 2 && session.moves < session.maxMoves) {
       session.moves += 1;
       bonusText = " 连坠奖励 +1 步。";
     }
     setMiniFeedback(
-      `一下清掉 ${result.cleared} 枚。${result.combos >= 2 ? `还带出了 ${result.combos} 连下落，` : ""}场面顺了许多。${bonusText}`,
+      `一下清掉 ${result.cleared} 枚。${result.combos >= 2 ? `连锁来到 ${result.combos} Combo，` : ""}场面顺了许多。${bonusText}`,
     );
-  }
-  session.selected = null;
-  renderMiniStats(getMatch3StatBadges(session));
-  renderMatch3Board();
+    renderMiniStats(getMatch3StatBadges(session));
+    renderMatch3Board();
 
-  if (session.cleared >= session.target) {
-    finishMiniGame(true, session.cleared, "你顺手连出几波下落，把前厅里的怀疑声压了下去。");
-  } else if (session.moves <= 0) {
-    finishMiniGame(false, session.cleared, "你只压下了一半风声，还是有人盯上了你。");
+    if (session.cleared >= session.target) {
+      finishMiniGame(true, session.cleared, "你顺手连出几波下落，把前厅里的怀疑声压了下去。");
+    } else if (session.moves <= 0) {
+      finishMiniGame(false, session.cleared, "你只压下了一半风声，还是有人盯上了你。");
+    }
+  } finally {
+    session.comboCount = 0;
+    session.animating = false;
   }
 }
 
 function onMatch3Click(index) {
   const session = stateStore.miniSession;
-  if (!session || session.type !== "match3" || stateStore.completedMiniGameResult) return;
+  if (!session || session.type !== "match3" || stateStore.completedMiniGameResult || session.animating) return;
   if (Date.now() < stateStore.suppressMatch3ClickUntil) return;
 
   if (session.selected === null) {
@@ -1435,7 +1758,7 @@ function onMatch3Click(index) {
     return;
   }
 
-  tryMatch3Swap(session.selected, index);
+  void tryMatch3Swap(session.selected, index);
 }
 
 function getSwipeTargetIndex(startIndex, direction, size) {
@@ -1450,7 +1773,7 @@ function getSwipeTargetIndex(startIndex, direction, size) {
 
 function onMatch3PointerDown(event) {
   const session = stateStore.miniSession;
-  if (!session || session.type !== "match3" || stateStore.completedMiniGameResult) return;
+  if (!session || session.type !== "match3" || stateStore.completedMiniGameResult || session.animating) return;
   const tile = event.target.closest(".match3-tile");
   if (!tile) return;
 
@@ -1465,7 +1788,7 @@ function onMatch3PointerUp(event) {
   const session = stateStore.miniSession;
   const swipe = stateStore.match3Swipe;
   stateStore.match3Swipe = null;
-  if (!swipe || !session || session.type !== "match3" || stateStore.completedMiniGameResult) return;
+  if (!swipe || !session || session.type !== "match3" || stateStore.completedMiniGameResult || session.animating) return;
 
   const dx = event.clientX - swipe.startX;
   const dy = event.clientY - swipe.startY;
@@ -1477,7 +1800,7 @@ function onMatch3PointerUp(event) {
   if (targetIndex === null) return;
 
   stateStore.suppressMatch3ClickUntil = Date.now() + 220;
-  tryMatch3Swap(swipe.startIndex, targetIndex, true);
+  void tryMatch3Swap(swipe.startIndex, targetIndex, true);
 }
 
 function randomEmptyIndex(board) {
@@ -1755,8 +2078,9 @@ async function startMiniGame() {
   if (stateStore.pendingMiniGame.type === "snake") initSnake();
 }
 
-el.startButton.addEventListener("click", startChapter);
-el.restartButton.addEventListener("click", startChapter);
+el.openingStartButton?.addEventListener("click", () => startChapter({ autoStartOpeningMerge: true }));
+el.startButton.addEventListener("click", () => startChapter({ autoStartOpeningMerge: true }));
+el.restartButton.addEventListener("click", () => startChapter({ autoStartOpeningMerge: true }));
 el.freeSubmit.addEventListener("click", () => {
   const defaultChoice = stateStore.currentScene?.choices?.[0] || {
     id: "free-steady",
